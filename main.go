@@ -24,15 +24,18 @@ var (
 )
 
 func main() {
-	keyFlag := flag.String("key", "", "")
-	commonNameFlag := flag.String("common-name", "", "")
-	orgFlag := flag.String("org", "", "")
+	keyFlag := flag.String("key", "KMS key path", "")
+	commonNameFlag := flag.String("common-name", "MICROMED BIOTECNOLOGIA S.A.", "")
+	orgFlag := flag.String("org", "MICROMED BIOTECNOLOGIA S.A.", "")
+	serialNumberFlag := flag.String("serial-number", "38.048.013/0001-03", "")
 	emailFlag := flag.String("email", "", "")
+	streetAddressFlag := flag.String("street-address", "R 03, LOTE 15 E 17 S/N", "")
+	postalCodeFlag := flag.String("postal-code", "", "")
+	orgUnitFlag := flag.String("org-unit", "", "")
+	countryFlag := flag.String("country", "BR", "")
+	provinceFlag := flag.String("province", "DISTRITO FEDERAL", "")
+	localityFlag := flag.String("locality", "BRASILIA", "")
 	outFlag := flag.String("out", "out.csr", "")
-	orgUnitFlag := flag.String("org-unit","", "")
-	countryFlag := flag.String("country","US", "")
-	provinceFlag := flag.String("province","California", "")
-	localityFlag := flag.String("locality","San Francisco", "")
 
 	flag.Parse()
 
@@ -53,11 +56,14 @@ func main() {
 
 	subj := pkix.Name{
 		CommonName:         *commonNameFlag,
+		SerialNumber:       *serialNumberFlag,
+		Country:            []string{*countryFlag},
 		Organization:       []string{*orgFlag},
 		OrganizationalUnit: []string{*orgUnitFlag},
-		Country:            []string{*countryFlag},
-		Province:           []string{*provinceFlag},
 		Locality:           []string{*localityFlag},
+		Province:           []string{*provinceFlag},
+		StreetAddress:      []string{*streetAddressFlag},
+		PostalCode:         []string{*postalCodeFlag},
 	}
 
 	rawSubj := subj.ToRDNSequence()
@@ -81,7 +87,7 @@ func main() {
 	// TODO Make this a flag or read from s.PublicKey?
 	//      https://cloud.google.com/kms/docs/algorithms
 	//      https://cloud.google.com/kms/docs/reference/rest/v1/projects.locations.keyRings.cryptoKeys#CryptoKeyVersionTemplate
-	template.SignatureAlgorithm = x509.ECDSAWithSHA256 // x509.SHA256WithRSAPSS
+	template.SignatureAlgorithm = x509.SHA256WithRSA //x509.SHA256WithRSAPSS //x509.ECDSAWithSHA256
 
 	f, err := os.Create(*outFlag)
 	if err != nil {
